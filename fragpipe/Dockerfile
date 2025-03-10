@@ -70,5 +70,7 @@ RUN rm /fragpipe_bin/*.zip
 RUN mkdir -p /fragpipe_bin/fragPipe-${FRAGPIPE_VERSION}/fragpipe/cache \
     && echo "fragpipe-config.tools-folder=/fragpipe_bin/fragPipe-22.0/fragpipe/tools" >> /fragpipe_bin/fragPipe-${FRAGPIPE_VERSION}/fragpipe/cache/fragpipe-ui.cache
 
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=C
+
 # set entrypoint
 ENTRYPOINT [ "/fragpipe_bin/fragPipe-22.0/fragpipe/bin/fragpipe" ]
