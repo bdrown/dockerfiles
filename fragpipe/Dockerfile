@@ -2,7 +2,7 @@ FROM ubuntu:24.04 AS base
 LABEL maintainer="Bryon Drown <bsdrown@purdue.edu>"
 
 ARG DEBIAN_FRONTEND=noninteractive
-ENV FRAGPIPE_VERSION=23.0
+ENV FRAGPIPE_VERSION=23.1
 
 # update and upgrade packages
 RUN apt-get -y update --fix-missing \
@@ -65,7 +65,7 @@ RUN export JAVA_HOME
 
 FROM base AS complete
 
-ENV FRAGPIPE_VERSION=23.0 MSF_VERSION=4.2 IONQUANT_VERSION=1.11.9 DIATRACER_VERSION=1.2.5
+ENV FRAGPIPE_VERSION=23.1 MSF_VERSION=4.3 IONQUANT_VERSION=1.11.11 DIATRACER_VERSION=1.3.3
 WORKDIR /fragpipe_bin
 
 # to include MSFragger and other tools into the image, they need to be accessed from the host
@@ -83,4 +83,4 @@ RUN mkdir -p /fragpipe_bin/fragPipe-${FRAGPIPE_VERSION}/fragpipe-${FRAGPIPE_VERS
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=C
 
 # set entrypoint
-ENTRYPOINT [ "/fragpipe_bin/fragPipe-23.0/fragpipe-23.0/bin/fragpipe" ]
+ENTRYPOINT [ "/fragpipe_bin/fragPipe-23.1/fragpipe-23.1/bin/fragpipe" ]
