@@ -1,0 +1,68 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%labels
+    Maintainer bdrown
+    Description "Apptainer definition file for FragPipe"
+
+%post
+    # update and upgrade packages
+    apt-get -y update --fix-missing \
+        && apt-get -y upgrade \
+        && apt-get -y update \
+        && apt-get -y autoremove
+
+    # install mono
+    apt-get -y install ca-certificates gnupg
+    gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | tee /etc/apt/sources.list.d/mono-official-stable.list
+    apt-get -y update
+    apt-get -y install mono-devel
+
+    apt install -y software-properties-common
+    add-apt-repository ppa:deadsnakes/ppa
+    add-apt-repository ppa:dotnet/backports
+    apt-get -y update
+
+# install dependencies
+RUN apt-get -y install \
+    git \
+    python3.11 \
+    python3-pip \
+    tar \
+    unzip \
+    wget \
+    openjdk-17-jdk \
+    vim \
+    dotnet-runtime-6.0
+
+# install python packages
+RUN pip uninstall --break-system-packages easypqp \
+    && pip install --break-system-packages git+https://github.com/Nesvilab/easypqp.git@master \
+    && pip install --break-system-packages lxml \
+    && pip install --break-system-packages plotly \
+    && pip install --break-system-packages kaleido \
+    && pip install --break-system-packages narwhals \
+    && pip install --break-system-packages pyarrow \
+    && pip install --break-system-packages pypdf2
+
+
+    # Set up FragPipe version and download URL
+    FRAGPIPE_VERSION=22.0
+    FRAGPIPE_URL=https://github.com/Nesvilab/FragPipe/releases/download/v${FRAGPIPE_VERSION}/fragpipe_${FRAGPIPE_VERSION}.zip
+
+    # Download and extract FragPipe
+    mkdir -p /opt/fragpipe
+    wget -O /tmp/fragpipe.zip $FRAGPIPE_URL
+    unzip /tmp/fragpipe.zip -d /opt/fragpipe
+    rm /tmp/fragpipe.zip
+
+    # Optional: set permissions
+    chmod -R a+rX /opt/fragpipe
+
+%environment
+    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export PATH=/opt/fragpipe:$PATH
+
+%runscript
+    exec java -jar /opt/fragpipe/fragpipe.jar "$@"
